@@ -241,17 +241,17 @@ function check_config()
 			CENTRIFYDC_KEYTAB_S3_BUCKET=${CENTRIFYDC_KEYTAB_S3_BUCKET:-}
 			if [ "$CENTRIFYDC_KEYTAB_S3_BUCKET" = "" ];then
 				echo "$CENTRIFY_MSG_PREX: requires a S3 bucket for the keytab file associated with the user who joins to Active Directory" 
-				return 1
+				return 0
 			fi
 		elif [ "$CENTRIFYDC_USE_CUSTOM_KEYTAB_FUNCTION" = "yes" ]; then
 			CENTRIFYDC_CUSTOM_KEYTAB_FUNCTION=${CENTRIFYDC_CUSTOM_KEYTAB_FUNCTION:-}
 			if [ "$CENTRIFYDC_CUSTOM_KEYTAB_FUNCTION" = "" ]; then
 				echo "$CENTRIFY_MSG_PREX: must define custom login function to obtain login.keytab"
-				return 1
+				return 0
 			fi
 		else
 			echo "$CENTRIFY_MSG_PREX:  illegal value specified for CENTRIFYDC_USE_CUSTOM_KEYTAB_FUNCTION.  Must be yes or no."
-			return 1
+			return 0
         fi
     fi
     centrify_packages=`echo -n "$CENTRIFYDC_ADDITIONAL_PACKAGES" | awk '{for(i=1;i<=NF;i++){ print $i;}}' | sort | uniq | awk '{printf("%s ", $1)}' |  awk 'BEGIN {invalid=0} {if(invalid != 1) {for(i=1;i<=NF;i++){if($i != "centrifydc-ldapproxy" && $i != "centrifydc-openssh" && $i != "") {invalid=1;printf("invalid ");break};if ( i == 1) { printf("%s", $i)} else { printf(" %s", $i)}} }}'`
@@ -301,29 +301,7 @@ function install_packages()
 function get_keytab_file()
 {
     if [ "$CENTRIFYDC_USE_CUSTOM_KEYTAB_FUNCTION" = "yes" ]; then
-		if [ "`type -t $CENTRIFYDC_CUSTOM_KEYTAB_FUNCTION`" == "function" ]; then
-			eval "$CENTRIFYDC_CUSTOM_KEYTAB_FUNCTION"
-			r=$?
-			if [ $r -ne 0 ]; then
-				echo "$CENTRIFY_MSG_PREX: download login.keytab from user defined function failed"
-			fi
-			if [ ! -f $centrifydc_deploy_dir/login.keytab ]; then
-				echo "$CENTRIFY_MSG_PREX: login.keytab not set up in custom function $CENTRIFYDC_CUSTOM_KEYTAB_FUNCTION."
-				# return 2 (ENOENT)
-				return 2
-			fi 
-			chmod 0600 $centrifydc_deploy_dir/login.keytab
-			return $r
-		else
-			echo "$CENTRIFY_MSG_PREX: user defined function does not exist or is not a function"
-			return 2
-		fi
-	else
-		aws s3 cp s3://$CENTRIFYDC_KEYTAB_S3_BUCKET/login.keytab $centrifydc_deploy_dir/
-		r=$?
-		if [ $r -ne 0 ];then
-			echo "$CENTRIFY_MSG_PREX: download login.keytab from s3 bucket failed" 
-		fi
+		cp ./login.keytab $centrifydc_deploy_dir/login.keytab
 		chmod 0600 $centrifydc_deploy_dir/login.keytab
 		return $r
 	fi
