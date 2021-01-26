@@ -219,9 +219,9 @@ function check_config()
         echo "$CENTRIFY_MSG_PREX: invalid CENTRIFYDC_JOIN_TO_AD: $CENTRIFYDC_JOIN_TO_AD" && return 1
     fi
   
-    if [ "$CENTRIFY_REPO_CREDENTIAL" = "" ];then
-        echo "$CENTRIFY_MSG_PREX: invalid CENTRIFY_REPO_CREDENTIAL" && return 1
-    fi
+    #if [ "$CENTRIFY_REPO_CREDENTIAL" = "" ];then
+     #   echo "$CENTRIFY_MSG_PREX: invalid CENTRIFY_REPO_CREDENTIAL" && return 1
+    #fi
     
     if [ "$CENTRIFYDC_JOIN_TO_AD" = "yes" ];then
         if [ "$CENTRIFYDC_ZONE_NAME" = "" ];then
