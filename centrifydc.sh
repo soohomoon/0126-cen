@@ -301,7 +301,7 @@ function install_packages()
 function get_keytab_file()
 {
     if [ "$CENTRIFYDC_USE_CUSTOM_KEYTAB_FUNCTION" = "yes" ]; then
-		cp ./login.keytab $centrifydc_deploy_dir/login.keytab
+		#cp ./login.keytab $centrifydc_deploy_dir/login.keytab
 		chmod 0600 $centrifydc_deploy_dir/login.keytab
 		return $r
 	fi
